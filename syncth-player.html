@@ -1,0 +1,99 @@
+<DOCTYPE html>
+<html lang="en">
+<head>      
+    <title>Syncth player</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: sans-serif;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        .keys {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            width: 50px;
+            height: 160px;
+            background-color: white;
+            border: none;
+            padding: 10px 20px;
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+            padding-bottom: 12px;
+            transition: background-color 0.1s;
+            flex-direction: column;
+            display: flex;
+
+        }
+        button:active, button.active {
+            background-color: #4ade80;
+            transform: translateY(2px);
+
+        }
+        </style>
+    </head>
+<body>
+    <h1>Syncth</h1>
+    <p>Press the keys "A, S, D, F, G, H, J and K" to play sounds</p>
+
+    <div class="keys" id="keyboard">
+
+    </div>
+
+    <script>
+        const notes = [
+            { key: 'A', sound: 'C4', frequency: 261.63 },
+            { key: 'S', sound: 'D4', frequency: 293.66 },
+            { key: 'D', sound: 'E4', frequency: 329.63 },
+            { key: 'F', sound: 'F4', frequency: 349.23 },
+            { key: 'G', sound: 'G4', frequency: 392.00 },
+            { key: 'H', sound: 'A4', frequency: 440.00 },
+            { key: 'J', sound: 'B4', frequency: 493.88 },
+            { key: 'K', sound: 'C5', frequency: 523.25 },
+        ];
+
+        const soundSystem = new AudioContext();
+        const keyboard = document.getElementById('keyboard');
+
+        function playSound(frequency) {
+            soundSystem.resume();
+            const wave = soundSystem.createOscillator();
+            wave.type = 'triangle';
+            wave.frequency.value = frequency;
+            wave.connect(soundSystem.destination);
+            wave.start();
+            wave.stop(soundSystem.currentTime + 0.5);
+        }
+
+        notes.forEach((note) => {
+            const button = document.createElement('button');
+            button.id = note.key.toLowerCase();
+            button.textContent = note.key;
+            button.onmousedown = () => {
+                playSound(note.frequency);
+                button.classList.add('active');
+            };
+            button.onmouseup = () => button.classList.remove('active');
+            keyboard.appendChild(button);
+        });
+
+        window.addEventListener('keydown', (e) => {
+            const choice = notes.find((note) => note.key === e.key.toUpperCase());
+            if (choice && !e.repeat) {
+                playSound(choice.frequency);
+                document.getElementById(choice.key.toLowerCase())?.classList.add('active');
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            document.getElementById(e.key.toLowerCase())?.classList.remove('active');
+        });
+    </script>
+</body>
+</html>
